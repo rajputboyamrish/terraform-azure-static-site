@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terraform Static Website - Amrish Kumar</title>
+
+  <!-- Basic styling -->
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --primary: #2563eb;
+      --secondary: #1e40af;
+      --text-color: #0f172a;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+      padding: 1.5rem 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: var(--secondary);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: #334155;
+    }
+
+    .emoji {
+      font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 1rem;
+      font-weight: 500;
+      transition: background 0.2s ease-in-out;
+    }
+
+    .button:hover {
+      background: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+  <header>🌐 Terraform Static Website</header>
+  <main>
+    <h1>Hello from <span style="color:#1e40af;">Amrish Kumar</span>!</h1>
+    <p>
+      This site is automatically provisioned using <strong>Terraform</strong> on
+      <strong>Microsoft Azure</strong>.
+    </p>
+    <p>
+      Everything here — from the resource group, storage account, and static site
+      hosting — was created as <em>Infrastructure as Code (IaC)</em> using
+      declarative configuration.
+    </p>
+    <a class="button" href="https://github.com/" target="_blank">🚀 Visit GitHub</a>
+  </main>
+  <footer>
+    © 2025 Amrish Kumar • Deployed with ❤️ using Terraform
+  </footer>
+</body>
+</html>
+
