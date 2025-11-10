@@ -1,166 +1,143 @@
-# 🚀 Terraform + Azure Static Website Deployment
+# 🌐 Terraform Azure Static Website — Automated Deployment via GitHub Actions
 
-This project demonstrates how to deploy a **static website** to **Azure Storage** using **Terraform** and automate the deployment with **GitHub Actions**.
+## 📁 Repository Structure
 
----
-
-## 📋 Prerequisites
-
-Before starting, make sure you have:
-
-- An **Azure subscription**
-- A **GitHub account**
-- Terraform installed or access to **Azure Cloud Shell**
-- Permissions to create resources in Azure
-
----
-
-## ⚙️ Step 1 — Set Up Terraform Files
-
-In your repository, create the following files:
-
-### `main.tf`
-
-```hcl
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~>3.0"
-    }
-  }
-  required_version = ">= 1.7.0"
-}
-
-provider "azurerm" {
-  features {}
-}
-
-resource "azurerm_resource_group" "rg" {
-  name     = "terraform-static-site-rg"
-  location = "West India"
-}
-
-resource "azurerm_storage_account" "storage" {
-  name                     = "tfstaticsite${random_integer.suffix.result}"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  static_website {
-    index_document = "index.html"
-    error_404_document = "error.html"
-  }
-}
-
-resource "random_integer" "suffix" {
-  min = 10000
-  max = 99999
-}
+```
+.github/workflows/       → Contains the GitHub Actions workflow (deploy.yml)
+.gitignore               → Ignores unnecessary Terraform or system files
+index.html               → Static HTML page to host on Azure Blob Storage
+main.tf                  → Main Terraform configuration (resources definition)
+output.tf                → Outputs (e.g., website endpoint URL)
+provider.tf              → Azure provider configuration
+terraform.tfvars         → Variable values (like resource group name, location)
+variable.tf              → Variable definitions used across Terraform files
+README.md                → Documentation (this file)
 ```
 
 ---
 
-## ☁️ Step 2 — Connect Cloud Shell to GitHub
+## 🎯 **Lab Objective**
+
+This project demonstrates Infrastructure-as-Code (IaC) using **Terraform** and **GitHub Actions** to:
+
+1. Provision Azure resources (Resource Group + Storage Account).
+2. Host a **static website** on Azure Blob Storage.
+3. Automate deployment using **GitHub Actions** CI/CD pipeline.
+
+---
+
+## 🚀 **Steps to Run**
+
+### **Step 1: Clone the Repository**
 
 ```bash
-git config --global user.name "Amrish Kumar"
-git config --global user.email "your_email@example.com"
-git init
-git remote add origin https://github.com/<your-username>/terraform-azure-static-site.git
-git add .
-git commit -m "Initial commit"
-git push -u origin main
+git clone https://github.com/rajputboyamrish/terraform-azure-static-site.git
+cd terraform-azure-static-site
 ```
-
-If you get an authentication error, [use a Personal Access Token (PAT)](https://github.com/settings/tokens) instead of your password.
-git remote set-url origin https://<YOUR_GITHUB_USERNAME>@github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
 
 ---
 
-## 🔐 Step 3 — Create Azure Credentials for GitHub Actions
-
-In Azure Cloud Shell:
+### **Step 2: Initialize Terraform**
 
 ```bash
-az ad sp create-for-rbac --name "terraform-github" --role="Contributor" --scopes="/subscriptions/<subscription-id>" --sdk-auth
+terraform init
 ```
 
-Copy the JSON output and go to your GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
+### **Step 3: Plan Infrastructure**
 
-Name the secret: `AZURE_CREDENTIALS`  
-Paste the JSON value.
+```bash
+terraform plan
+```
+
+### **Step 4: Apply Configuration**
+
+```bash
+terraform apply -auto-approve
+```
+
+This will:
+- Create a **Resource Group**
+- Create a **Storage Account**
+- Enable **Static Website Hosting**
+- Upload `index.html` to Azure Blob Storage
 
 ---
 
-## ⚡ Step 4 — Create GitHub Actions Workflow
+## ⚙️ **GitHub Actions Workflow**
 
-Create a file: `.github/workflows/deploy.yml`
+File: `.github/workflows/deploy.yml`
 
-```yaml
-name: Terraform Deploy to Azure
+This workflow:
+- Runs automatically on **push to main**
+- Logs into Azure using your Service Principal credentials (stored as a GitHub secret)
+- Executes Terraform commands:
+  - `terraform init`
+  - `terraform plan`
+  - `terraform apply`
 
-on:
-  push:
-    branches:
-      - main
+### **Setup GitHub Secret**
 
-permissions:
-  contents: read
-  id-token: write
+In your repo:
+1. Go to **Settings → Secrets and variables → Actions**
+2. Click **New repository secret**
+3. Add:
+   - **Name:** `AZURE_CREDENTIALS`
+   - **Value:** (Output from `az ad sp create-for-rbac` command)
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.0
-
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+Example:
+```json
+{
+  "clientId": "xxxxx",
+  "clientSecret": "xxxxx",
+  "subscriptionId": "xxxxx",
+  "tenantId": "xxxxx"
+}
 ```
 
 ---
 
-## 🌐 Step 5 — Access Your Static Website
+## 🌍 **Access the Website**
 
-After deployment, go to the Azure Portal → Storage Account → **Static website** → find your **Primary Endpoint URL**.
+After a successful run, you’ll see the website endpoint in the Terraform output.
 
-Open it in your browser — your static site should be live 🎉
-
----
-
-## 🧠 Troubleshooting
-
-- **Role assignment failed:** You may not have permission to assign roles. Contact your Azure admin.
-- **GitHub push error:** Use Personal Access Token instead of password.
-- **Site not updating:** Re-run `terraform apply` or check your workflow logs.
+Example:
+```
+https://amrishterraformblob.z13.web.core.windows.net/
+```
 
 ---
 
-## ✍️ Author
+## 🏷️ **Tags for Cost Tracking**
 
+All Azure resources are tagged automatically for easy cost management.
+
+---
+
+## 🧩 **Research Section**
+
+### 🔹 Terraform vs Bicep
+
+| Feature | Terraform | Bicep |
+|----------|------------|-------|
+| Language Type | HCL (cross-cloud) | ARM-based (Azure only) |
+| Reusability | High | Moderate |
+| State Management | Remote/Local | Managed by Azure |
+| Learning Curve | Medium | Easy for Azure users |
+| Best Use Case | Multi-cloud IaC | Azure-native deployments |
+
+---
+
+## 👤 **Author**
 **Amrish Kumar**  
-🌐 GitHub: [rajputboyamrish](https://github.com/rajputboyamrish)
+GitHub: [@rajputboyamrish](https://github.com/rajputboyamrish)
 
 ---
 
-✅ *This lab automates infrastructure deployment and integrates continuous delivery via GitHub Actions.*
+## ✅ **Deliverables**
+
+- ✅ Working Terraform code  
+- ✅ Successful GitHub Actions workflow  
+- ✅ Deployed static website on Azure  
+- ✅ Tagged resources for cost tracking  
+- ✅ README.md (Documentation)
 
